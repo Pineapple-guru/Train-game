@@ -1,9 +1,10 @@
 Tile = Object:extend()
 
-function Tile:new(x, y)
+function Tile:new(x, y, name, imageFile)
     self.x = x
     self.y = y
-    self.image = love.graphics.newImage("train_track.png")
+    self.name = name
+    self.image = love.graphics.newImage(imageFile)
 end
 
 function Tile:draw()
