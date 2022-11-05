@@ -45,8 +45,13 @@ function love.update(dt)
     end
     if love.mouse.isDown(1) and track_limit > 0 then
         if ((mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] - 1 and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2]) or (mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] + 1 and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2]) or (mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2] - 1) or (mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2] + 1)) and check_square(mouse_floor_x, mouse_floor_y) then
-            local track = Tile(mouse_floor_x * x, mouse_floor_y * y, "track", "track_tile.png")
-            object_tracker[mouse_floor_x + 1][mouse_floor_y + 1] = track
+            if mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] then
+                local track = Tile(mouse_floor_x * x, mouse_floor_y * y, "track", "ver_track_tile.png")
+                object_tracker[mouse_floor_x + 1][mouse_floor_y + 1] = track
+            else
+                local track = Tile(mouse_floor_x * x, mouse_floor_y * y, "track", "hor_track_tile.png")
+                object_tracker[mouse_floor_x + 1][mouse_floor_y + 1] = track
+            end
             table.insert(current_tile_stack, {mouse_floor_x, mouse_floor_y})
             track_limit = track_limit - 1
         end
