@@ -12,7 +12,6 @@ function love.load()
     mouse_floor_y = 0
     trainTracks = {}
     object_tracker = {}
-
     for i = 0,15 do
         table.insert(object_tracker, {})
         for j = 0,8 do
@@ -24,7 +23,7 @@ function love.load()
     object_tracker[3][6] = start_tile
     local end_tile = Tile(mouse_floor_x * x, mouse_floor_y * y, "end", "end_tile.png")
     object_tracker[13][2] = end_tile
-    --available_tiles_finder(2, 5)
+    current_tile = {2, 5}
 end
 
 function love.update(dt)
@@ -32,11 +31,12 @@ function love.update(dt)
     mouse_floor_x = math.floor(mousex / 64)
     mouse_floor_y = math.floor(mousey / 64)
     if love.mouse.isDown(1) then
-        if object_tracker[mouse_floor_x + 1][mouse_floor_y + 1].name == "empty" then
+        --if object_tracker[mouse_floor_x + 1][mouse_floor_y + 1].name == "empty" then
+        if ((mouse_floor_x == current_tile[1] - 1 and mouse_floor_y == current_tile[2]) or (mouse_floor_x == current_tile[1] + 1 and mouse_floor_y == current_tile[2]) or (mouse_floor_x == current_tile[1] and mouse_floor_y == current_tile[2] - 1) or (mouse_floor_x == current_tile[1] and mouse_floor_y == current_tile[2] + 1)) and check_square(mouse_floor_x, mouse_floor_y) then
             local track = Tile(mouse_floor_x * x, mouse_floor_y * y, "track", "track_tile.png")
             table.insert(trainTracks, track)
             object_tracker[mouse_floor_x + 1][mouse_floor_y + 1] = track
-            --available_tiles_finder(mouse_floor_x, mouse_floor_y)
+            current_tile = {mouse_floor_x, mouse_floor_y}
         end
     end
 end
@@ -57,36 +57,22 @@ end
 
 function check_square(x, y)
     if x >= 0 and x <= 15 and y >= 0 and y <= 8 then
-        return not object_tracker[x + 1][y + 1]
+        return object_tracker[x + 1][y + 1].name == "empty"
     end
 end
     
 function available_tiles_finder(x, y)
+    option_table = {}
     if check_square(x + 1, y) then
-        table.insert(options_for_tiles, {x + 1, y})
-        print(x + 1, y)
+        table.insert(option_table, {x + 1, y})
     end
     if check_square(x - 1, y) then
-        table.insert(options_for_tiles, {x - 1, y})
-        print(x - 1, y)
+        table.insert(option_table, {x - 1, y})
     end
     if check_square(x, y + 1) then
-        table.insert(options_for_tiles, {x, y + 1})
-        print(x, y + 1)
+        table.insert(option_table, {x, y + 1})
     end
     if check_square(x, y - 1) then
-        table.insert(options_for_tiles, {x, y - 1})
-        print(x, y - 1)
+        table.insert(option_table, {x, y - 1})
     end
 end
-      
---function get_index(tabl, obj)
---    for i, item in ipairs(tabl) do
---        print(i, item, obj)
---        if item == obj then
---            print("found")
---            return i
---        end
---    end
---    return false
---end
