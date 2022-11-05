@@ -1,3 +1,6 @@
+Object = require "classic"
+require "tile"
+
 function love.load()
     x = 64
     y = 64
@@ -5,13 +8,17 @@ function love.load()
     gridh = 64
     mousex = 0
     mousey = 0
+    trainTracks = {}
 end
 
 function love.update(dt)
     mousex, mousey = love.mouse.getPosition()
-    print(math.floor(mousex / 64) + 1, math.floor(mousey / 64) + 1)
     mouse_floor_x = math.floor(mousex / 64)
     mouse_floor_y = math.floor(mousey / 64)
+    if love.mouse.isDown(1) then
+        local track = Tile(mouse_floor_x * x, mouse_floor_y * y)
+        table.insert(trainTracks, track)
+    end
 end
 
 function love.draw()
@@ -21,4 +28,7 @@ function love.draw()
         end
     end
     love.graphics.rectangle("fill", x * mouse_floor_x, y * mouse_floor_y, gridw, gridh)
+    for i,track in ipairs(trainTracks) do
+        track:draw()
+    end
 end
