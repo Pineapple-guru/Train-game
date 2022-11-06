@@ -1,5 +1,6 @@
 Object = require "classic"
 require "tile"
+require "train"
 
 function love.load()
     x = 64
@@ -14,6 +15,7 @@ function love.load()
     success = false
     bg = love.graphics.newImage("background.png")
     object_tracker = {}
+    current_tile_stack = {}
     for i = 0,15 do
         table.insert(object_tracker, {})
         for j = 0,8 do
@@ -26,7 +28,6 @@ function love.load()
     local end_tile = Tile(12 * x, 1 * y, "end", "end_tile.png")
     object_tracker[13][2] = end_tile
     end_position = {12, 1}
-    current_tile_stack = {}
     table.insert(current_tile_stack, {2, 5})
     local mountain_tile = Tile(6 * x, 3 * y, "mountain", "mountain_tile.png")
     object_tracker[7][4] = mountain_tile
@@ -42,6 +43,8 @@ function love.update(dt)
     mouse_floor_y = math.floor(mousey / 64)
     if (current_tile_stack[table.maxn(current_tile_stack)][1] - 1 == end_position[1] and current_tile_stack[table.maxn(current_tile_stack)][2] == end_position[2]) or (current_tile_stack[table.maxn(current_tile_stack)][1] + 1 == end_position[1] and current_tile_stack[table.maxn(current_tile_stack)][2] == end_position[2]) or (current_tile_stack[table.maxn(current_tile_stack)][1] == end_position[1] and current_tile_stack[table.maxn(current_tile_stack)][2] - 1 == end_position[2]) or (current_tile_stack[table.maxn(current_tile_stack)][1] == end_position[1] and current_tile_stack[table.maxn(current_tile_stack)][2] == end_position[2] + 1) then
         success = true
+        table.insert(current_tile_stack, end_position)
+        train = Train(current_tile_stack)
     end
     if love.mouse.isDown(1) and track_limit > 0 then
         if ((mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] - 1 and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2]) or (mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] + 1 and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2]) or (mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2] - 1) or (mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2] + 1)) and check_square(mouse_floor_x, mouse_floor_y) then
@@ -64,6 +67,9 @@ function love.update(dt)
             track_limit = track_limit + 1
         end
     end
+    if success then
+        train:update(dt)
+    end
 end
 
 function love.draw()
@@ -76,6 +82,7 @@ function love.draw()
     love.graphics.print("Number of tracks left: " .. track_limit, 0, 0)
     if success then
         love.graphics.print("Congratulations, you beat the level!", 524, 0)
+        train:draw()
     end
 end
 
