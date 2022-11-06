@@ -13,6 +13,7 @@ function love.load()
     mouse_floor_y = 0
     track_limit = 16
     success = false
+    freeze = false
     bg = love.graphics.newImage("background.png")
     object_tracker = {}
     current_tile_stack = {}
@@ -43,28 +44,64 @@ function love.update(dt)
     mouse_floor_y = math.floor(mousey / 64)
     if (current_tile_stack[table.maxn(current_tile_stack)][1] - 1 == end_position[1] and current_tile_stack[table.maxn(current_tile_stack)][2] == end_position[2]) or (current_tile_stack[table.maxn(current_tile_stack)][1] + 1 == end_position[1] and current_tile_stack[table.maxn(current_tile_stack)][2] == end_position[2]) or (current_tile_stack[table.maxn(current_tile_stack)][1] == end_position[1] and current_tile_stack[table.maxn(current_tile_stack)][2] - 1 == end_position[2]) or (current_tile_stack[table.maxn(current_tile_stack)][1] == end_position[1] and current_tile_stack[table.maxn(current_tile_stack)][2] == end_position[2] + 1) then
         success = true
+        freeze = true
         table.insert(current_tile_stack, end_position)
         train = Train(current_tile_stack)
     end
-    if love.mouse.isDown(1) and track_limit > 0 then
+    if love.mouse.isDown(1) and track_limit > 0 and not freeze then
         if ((mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] - 1 and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2]) or (mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] + 1 and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2]) or (mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2] - 1) or (mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2] + 1)) and check_square(mouse_floor_x, mouse_floor_y) then
             if mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] then
-                local track = Tile(mouse_floor_x * x, mouse_floor_y * y, "track", "ver_track_tile.png")
+                local track = Tile(mouse_floor_x * x, mouse_floor_y * y, "track", "trackVertical.png")
                 object_tracker[mouse_floor_x + 1][mouse_floor_y + 1] = track
             else
-                local track = Tile(mouse_floor_x * x, mouse_floor_y * y, "track", "hor_track_tile.png")
+                local track = Tile(mouse_floor_x * x, mouse_floor_y * y, "track", "trackHorizontal.png")
                 object_tracker[mouse_floor_x + 1][mouse_floor_y + 1] = track
             end
             table.insert(current_tile_stack, {mouse_floor_x, mouse_floor_y})
             track_limit = track_limit - 1
+            if table.maxn(current_tile_stack) >= 4 then
+                if current_tile_stack[table.maxn(current_tile_stack) - 2][1] == current_tile_stack[table.maxn(current_tile_stack)][1] - 1 and current_tile_stack[table.maxn(current_tile_stack) - 2][2] == current_tile_stack[table.maxn(current_tile_stack)][2] - 1 then
+                    if current_tile_stack[table.maxn(current_tile_stack) - 1][1] == current_tile_stack[table.maxn(current_tile_stack)][1] then
+                        object_tracker[current_tile_stack[table.maxn(current_tile_stack) - 1][1] + 1][current_tile_stack[table.maxn(current_tile_stack) - 1][2] + 1].image = love.graphics.newImage("trackTopLeftTurn.png")
+                    else
+                        object_tracker[current_tile_stack[table.maxn(current_tile_stack) - 1][1] + 1][current_tile_stack[table.maxn(current_tile_stack) - 1][2] + 1].image = love.graphics.newImage("trackBottomRightTurn.png")
+                    end
+                end
+                if current_tile_stack[table.maxn(current_tile_stack) - 2][1] == current_tile_stack[table.maxn(current_tile_stack)][1] + 1 and current_tile_stack[table.maxn(current_tile_stack) - 2][2] == current_tile_stack[table.maxn(current_tile_stack)][2] - 1 then
+                    if current_tile_stack[table.maxn(current_tile_stack) - 1][1] == current_tile_stack[table.maxn(current_tile_stack)][1] then
+                        object_tracker[current_tile_stack[table.maxn(current_tile_stack) - 1][1] + 1][current_tile_stack[table.maxn(current_tile_stack) - 1][2] + 1].image = love.graphics.newImage("trackTopRightTurn.png")
+                    else
+                        object_tracker[current_tile_stack[table.maxn(current_tile_stack) - 1][1] + 1][current_tile_stack[table.maxn(current_tile_stack) - 1][2] + 1].image = love.graphics.newImage("trackBottomLeftTurn.png")
+                    end
+                end
+                if current_tile_stack[table.maxn(current_tile_stack) - 2][1] == current_tile_stack[table.maxn(current_tile_stack)][1] - 1 and current_tile_stack[table.maxn(current_tile_stack) - 2][2] == current_tile_stack[table.maxn(current_tile_stack)][2] + 1 then
+                    if current_tile_stack[table.maxn(current_tile_stack) - 1][1] == current_tile_stack[table.maxn(current_tile_stack)][1] then
+                        object_tracker[current_tile_stack[table.maxn(current_tile_stack) - 1][1] + 1][current_tile_stack[table.maxn(current_tile_stack) - 1][2] + 1].image = love.graphics.newImage("trackBottomLeftTurn.png")
+                    else
+                        object_tracker[current_tile_stack[table.maxn(current_tile_stack) - 1][1] + 1][current_tile_stack[table.maxn(current_tile_stack) - 1][2] + 1].image = love.graphics.newImage("trackTopRightTurn.png")
+                    end
+                end
+                if current_tile_stack[table.maxn(current_tile_stack) - 2][1] == current_tile_stack[table.maxn(current_tile_stack)][1] + 1 and current_tile_stack[table.maxn(current_tile_stack) - 2][2] == current_tile_stack[table.maxn(current_tile_stack)][2] + 1 then
+                    if current_tile_stack[table.maxn(current_tile_stack) - 1][1] == current_tile_stack[table.maxn(current_tile_stack)][1] then
+                        object_tracker[current_tile_stack[table.maxn(current_tile_stack) - 1][1] + 1][current_tile_stack[table.maxn(current_tile_stack) - 1][2] + 1].image = love.graphics.newImage("trackBottomRightTurn.png")
+                    else
+                        object_tracker[current_tile_stack[table.maxn(current_tile_stack) - 1][1] + 1][current_tile_stack[table.maxn(current_tile_stack) - 1][2] + 1].image = love.graphics.newImage("trackTopLeftTurn.png")
+                    end
+                end
+            end
         end
     end
-    if love.mouse.isDown(2) then
+    if love.mouse.isDown(2) and not freeze then
         if mouse_floor_x == current_tile_stack[table.maxn(current_tile_stack)][1] and mouse_floor_y == current_tile_stack[table.maxn(current_tile_stack)][2] and object_tracker[mouse_floor_x + 1][mouse_floor_y + 1].name == "track" then
             local empty_tile = Tile(mouse_floor_x * x, mouse_floor_y * y, "empty", "empty_tile.png")
             object_tracker[mouse_floor_x + 1][mouse_floor_y + 1] = empty_tile
             table.remove(current_tile_stack, table.maxn(current_tile_stack))
             track_limit = track_limit + 1
+            if current_tile_stack[table.maxn(current_tile_stack)][1] == current_tile_stack[table.maxn(current_tile_stack) - 1][1] then
+                object_tracker[current_tile_stack[table.maxn(current_tile_stack)][1] + 1][current_tile_stack[table.maxn(current_tile_stack)][2] + 1].image = love.graphics.newImage("trackVertical.png")
+            else
+                object_tracker[current_tile_stack[table.maxn(current_tile_stack)][1] + 1][current_tile_stack[table.maxn(current_tile_stack)][2] + 1].image = love.graphics.newImage("trackHorizontal.png")
+            end
         end
     end
     if success then
